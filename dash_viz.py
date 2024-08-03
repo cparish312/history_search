@@ -15,14 +15,19 @@ app = dash.Dash(__name__)
 node_ids = list()
 
 urls_values = []
+titles_values = []
+
 selected_urls = []
+selected_titles = []
 
 def create_line_plot_figure(data_points):
     global urls_values
+    global titles_values
 
     x_values = [point[0].start_time.to_pydatetime() for point in data_points]
     y_values = [point[1] for point in data_points]
     urls_values = [point[2] for point in data_points]
+    titles_values = [point[3] for point in data_points]
 
     fig = go.Figure(data=go.Scatter(x=x_values, y=y_values, mode='lines+markers'))
     fig.update_layout(
@@ -45,7 +50,7 @@ app.layout = html.Div([
     html.Div([
         html.Label('Search Text: ', htmlFor='input-search'),
         dcc.Input(id='input-search', type='text', placeholder='Enter search term'),
-        html.Label(' Distance Threshold: ', htmlFor='input-distance-threshold'),
+        html.Label(' Embedding Distance Threshold: ', htmlFor='input-distance-threshold'),
         dcc.Input(id='input-distance-threshold', type='number', placeholder='Enter threshold', value=0.8),
         html.Button('Search', id='button-search'),
     ], style={'margin-bottom': '10px'}),  # Add a bottom margin for spacing between sections
@@ -107,10 +112,12 @@ def open_urls(n_clicks):
 )
 def display_url(clickData):
     global selected_urls
+    global selected_titles
     if clickData:
         node_index = clickData['points'][0]['pointIndex']
         selected_urls = urls_values[node_index]  # Assume urls_values is defined globally or fetched dynamically
-        return ", ".join(selected_urls)
+        selected_titles = titles_values[node_index]
+        return ", ".join(selected_titles)
     else:
         raise dash.exceptions.PreventUpdate
 

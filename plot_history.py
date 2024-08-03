@@ -23,10 +23,11 @@ history = utils.get_firefox_history()
 def create_initial_data_points():
     history['month_year'] = history['datetime_local'].dt.to_period('M')
     month_url_counts = history.groupby('month_year').agg(
-                            num_urls=('url', 'count'),       # Count the number of URLs
-                            urls=('url', list)         # Create a list of URLs
+                            num_urls=('url', 'count'),       
+                            urls=('url', list),
+                            titles=('title', list)    
                         ).reset_index()
-    data_points = [(t, n, u) for t, n, u in zip(month_url_counts['month_year'], month_url_counts['num_urls'], month_url_counts['urls'])]
+    data_points = [(t, n, u, titles) for t, n, u, titles in zip(month_url_counts['month_year'], month_url_counts['num_urls'], month_url_counts['urls'], month_url_counts['titles'])]
     return data_points
 
 def search_history(text, distance_threshold=0.5, top_n=2000, time_bin="M"):
@@ -40,8 +41,9 @@ def search_history(text, distance_threshold=0.5, top_n=2000, time_bin="M"):
     results_history = history.loc[history['url'].isin(results_df['url'])]
     results_history['time_bin'] = results_history['datetime_local'].dt.to_period(time_bin)
     month_url_counts = results_history.groupby('time_bin').agg(
-                                            num_urls=('url', 'count'),       # Count the number of URLs
-                                            urls=('url', list)         # Create a list of URLs
+                                            num_urls=('url', 'count'),       
+                                            urls=('url', list),
+                                            titles=('title', list)        
                                         ).reset_index()
-    data_points = [(t, n, u) for t, n, u in zip(month_url_counts['time_bin'], month_url_counts['num_urls'], month_url_counts['urls'])]
+    data_points = [(t, n, u, titles) for t, n, u, titles in zip(month_url_counts['time_bin'], month_url_counts['num_urls'], month_url_counts['urls'], month_url_counts['titles'])]
     return data_points
