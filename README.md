@@ -7,5 +7,5 @@
     *   Activate the env using: `conda activate history_search`
 
 ## Run
-* First run will take a while to create embeddings
 * Run: `python timeline_viz.py`
+    * Note: First run will take a while to create embeddings
