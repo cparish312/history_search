@@ -1,32 +1,23 @@
 import os
-import sqlite3
-import shutil
 import pandas as pd
 from pathlib import Path
 
 import chromadb
-from chromadb import Documents, Embeddings, EmbeddingFunction
+from chromadb.utils import embedding_functions
 
-from mlx_embedding_models.embedding import EmbeddingModel
 
-from utils import get_firefox_history
+from utils import get_firefox_history, make_dir
 
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = BASE_DIR /  "data"
+make_dir(DATA_DIR)
+
 chromadb_path = os.path.join(DATA_DIR, "chromadb")
 
-MLX_EMBDEDDING_MODEL = "bge-large"
 
-class MLXEmbeddingFunction(EmbeddingFunction):
-    def __init__(self, model_id=MLX_EMBDEDDING_MODEL):
-        self.embedding_model = EmbeddingModel.from_registry(model_id)
-
-    def __call__(self, input: Documents) -> Embeddings:
-        return self.embedding_model.encode(input).tolist()
-
-def get_chroma_collection(collection_name="browser_history", model_id=MLX_EMBDEDDING_MODEL):
+def get_chroma_collection(collection_name="browser_history"):
     """Returns chromadb collections."""
-    embedding_function = MLXEmbeddingFunction(model_id=model_id)
+    embedding_function = embedding_functions.DefaultEmbeddingFunction()
     chroma_client = chromadb.PersistentClient(path=chromadb_path)
     chroma_collection = chroma_client.get_or_create_collection(collection_name, embedding_function=embedding_function)
     return chroma_collection
@@ -46,44 +37,6 @@ def chroma_search_results_to_df(chroma_search_results):
             d.update(chroma_search_results['metadatas'][i][j])
             results_l.append(d)
     return pd.DataFrame(results_l)
-
-def query_chroma(query_text: str, utc_milliseconds_start_date=None, utc_milliseconds_end_date=None, 
-                 max_chroma_results=200, chroma_collection=None):
-    """Queries chromadb with the query_text and the provided constraints.
-    Args:
-        query_text (str): Text to query chromadb of OCR results from user screenshots
-
-    returns query results from chroma collection
-    """
-    chroma_collection = get_chroma_collection() if chroma_collection is None else chroma_collection
-
-    conditions = []
-    if utc_milliseconds_start_date is not None:
-        conditions.append({"timestamp": {"$gte": int(utc_milliseconds_start_date)}})
-    
-    if utc_milliseconds_end_date is not None:
-        conditions.append({"timestamp": {"$lte": int(utc_milliseconds_end_date)}})
-    
-    if len(conditions) > 1:
-        chroma_search_results = chroma_collection.query(
-            query_texts=[query_text],
-            n_results=max_chroma_results,
-            where={
-                "$and": conditions
-            }
-        )
-    elif len(conditions) == 1:
-        chroma_search_results = chroma_collection.query(
-            query_texts=[query_text],
-            n_results=max_chroma_results,
-            where=conditions[0]
-        )
-    else:
-        chroma_search_results = chroma_collection.query(
-            query_texts=[query_text],
-            n_results=max_chroma_results,
-        )
-    return chroma_search_results
 
 def get_browser_history_chromadb_metadata(row):
     metadata_d = {"url" : row['url'], "title" : row['title'], "timestamp" : row['last_visit_date'], 

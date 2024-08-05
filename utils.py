@@ -1,11 +1,6 @@
 import os
-import requests
 import shutil
 import sqlite3
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from numba import njit, prange
-import numpy as np
 import pandas as pd
 import webbrowser
 
