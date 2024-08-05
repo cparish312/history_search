@@ -8,4 +8,4 @@
 
 ## Run
 * First run will take a while to create embeddings
-`python timeline_viz.py`
+* Run: `python timeline_viz.py`
