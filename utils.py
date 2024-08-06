@@ -48,6 +48,7 @@ def get_firefox_history(db_file=FIREFOX_HISTORY_FILE, db_file_tmp=FIREFOX_TMP_FI
     history['description'] = history['description'].fillna("No description")
     history['title_description'] = history.apply(lambda row: row["title"] + ":" + row['description'], axis=1)
     history['browser'] = "Firefox"
+    print(f"{len(history)} urls from Firefox")
     return history
 
 def get_chrome_history(db_file=CHROME_HISTORY_FILE, db_file_tmp=CHROME_TMP_FILE):
@@ -78,6 +79,7 @@ def get_chrome_history(db_file=CHROME_HISTORY_FILE, db_file_tmp=CHROME_TMP_FILE)
     history['description'] = history['title'].fillna("No description")
     history['title_description'] = history.apply(lambda row: row["title"] + ":" + row['description'], axis=1)
     history['browser'] = "Chrome"
+    print(f"{len(history)} urls from Chrome")
     return history
 
 def get_browser_history(kw_filter=True):
@@ -87,6 +89,9 @@ def get_browser_history(kw_filter=True):
     histories.append(get_chrome_history())
     
     history = pd.concat(histories)
+    if len(history) == 0:
+        print("No history found")
+        return history
     history = add_datetime(history)
     history = history.sort_values(by='timestamp', ascending=True)
 
