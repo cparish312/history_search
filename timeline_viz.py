@@ -46,7 +46,7 @@ app.layout = html.Div([
         html.Label('Search Text: ', htmlFor='input-search'),
         dcc.Input(id='input-search', type='text', placeholder='Enter search term'),
         html.Label(' Embedding Distance Threshold: ', htmlFor='input-distance-threshold'),
-        dcc.Input(id='input-distance-threshold', type='number', placeholder='Enter threshold', value=1.2),
+        dcc.Input(id='input-distance-threshold', type='number', placeholder='Enter threshold', value=1.3),
         html.Button('Search', id='button-search'),
     ], style={'margin-bottom': '10px'}),  # Add a bottom margin for spacing between sections
 
@@ -71,9 +71,9 @@ app.layout = html.Div([
         dcc.Graph(id='output-graph', figure=initial_figure, config={'staticPlot': False}),
     ], style={'margin-bottom': '20px'}),  # Ensure there is spacing around the graph
 
-    html.Div(
+    dcc.Markdown(
         id='output-urls',
-        children='URLS',  # Placeholder text or initial content
+        children='',  # Placeholder text or initial content
         style={
             'white-space': 'pre-wrap',
             'border': '1px solid #ccc',  # Optionally add a border for better visibility
@@ -84,13 +84,15 @@ app.layout = html.Div([
     html.Div(
         html.Button('Open URLs', id='button-open')
     )
-    ], style={'margin': '20px'})
+], style={'margin': '20px'})
 
 
 app.layout.children.append(html.Div(id='dummy-div', style={'display': 'none'}))
+
 @app.callback(
     Output('dummy-div', 'children'),  # Dummy output, not used in UI
-    [Input('button-open', 'n_clicks')],[],  # Capture the content of the output-urls div
+    [Input('button-open', 'n_clicks')],
+    [],
     prevent_initial_call=True
 )
 def open_urls(n_clicks):
@@ -112,7 +114,13 @@ def display_url(clickData):
         node_index = clickData['points'][0]['pointIndex']
         selected_urls = urls_values[node_index]  # Assume urls_values is defined globally or fetched dynamically
         selected_titles = titles_values[node_index]
-        return ", ".join(selected_titles)
+        
+        # Format URLs and titles as Markdown links
+        markdown_links = "\n".join(
+            [f"[{title}]({url})" for title, url in zip(selected_titles, selected_urls)]
+        )
+        
+        return markdown_links
     else:
         raise dash.exceptions.PreventUpdate
 
