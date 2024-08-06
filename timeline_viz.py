@@ -30,7 +30,7 @@ def create_line_plot_figure(data_points):
         title='Browser History',
         xaxis_title='Time',
         yaxis_title='Num URLs',
-        xaxis=dict(type='date', tickformat='%d %b %Y'),
+        xaxis=dict(type='date', tickformat='%d %b %Y %H:%M'),
         margin=dict(b=0, l=0, t=40, r=0),
         hovermode='closest'
     )
