@@ -89,6 +89,8 @@ def get_browser_history(kw_filter=True):
     history = add_datetime(history)
     history = history.sort_values(by='timestamp', ascending=True)
 
+    history = history.drop_duplicates(subset=['url'], keep='last')
+
     if kw_filter:
         filter_keywords = ["Inbox", "Gmail", "ChatGPT", "Home", "LinkedIn", "Sign In", "Google Slides", "Google Search"]
         for kw in filter_keywords:
