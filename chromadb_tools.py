@@ -39,8 +39,7 @@ def chroma_search_results_to_df(chroma_search_results):
     return pd.DataFrame(results_l)
 
 def get_browser_history_chromadb_metadata(row):
-    metadata_d = {"url" : row['url'], "title" : row['title'], "timestamp" : row['last_visit_date'], 
-            "visit_count" : row['visit_count'], "preview_image_url" : row["preview_image_url"]}
+    metadata_d = {"url" : row['url'], "title" : row['title'], "timestamp" : row['timestamp']}
     metadata_d_cleaned = {} # Values cannot be None
     for k, v in metadata_d.items():
         if v is None:
