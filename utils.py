@@ -26,6 +26,7 @@ elif platform == "darwin":
     FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
 elif platform == "win32":
+    print("Using windows")
     FIREFOX_HISTORY_FILE = Path(os.path.expanduser("\AppData\Roaming\Mozilla\Firefox\Profiles\vze01ffv.default-release\places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser("~\AppData\Local\Google\Chrome\User Data\Default\History"))
 
