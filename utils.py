@@ -1,6 +1,7 @@
 import os
 import shutil
 import sqlite3
+from pathlib import Path
 import pandas as pd
 import webbrowser
 
@@ -18,11 +19,11 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(base_dir, "data")
 make_dir(DATA_DIR)
 
-FIREFOX_HISTORY_FILE = os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite")
-FIREFOX_TMP_FILE = os.path.join(DATA_DIR, "firefox_history.sqlite")
+FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"))
+FIREFOX_TMP_FILE = Path(os.path.join(DATA_DIR, "firefox_history.sqlite"))
 
-CHROME_HISTORY_FILE = os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History")
-CHROME_TMP_FILE = os.path.join(DATA_DIR, "chrome_history.sqlite")
+CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
+CHROME_TMP_FILE = Path(os.path.join(DATA_DIR, "chrome_history.sqlite"))
 
 
 def add_datetime(df):
