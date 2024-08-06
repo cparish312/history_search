@@ -15,39 +15,85 @@ def make_dir(d):
         os.makedirs(d)
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-FIREFOX_DB_FILE = "/Users/connorparish/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"
 DATA_DIR = os.path.join(base_dir, "data")
 make_dir(DATA_DIR)
-DB_TMP_FILE = os.path.join(DATA_DIR, "places.sqlite")
+
+FIREFOX_HISTORY_FILE = os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite")
+FIREFOX_TMP_FILE = os.path.join(DATA_DIR, "firefox_history.sqlite")
+
+CHROME_HISTORY_FILE = os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History")
+CHROME_TMP_FILE = os.path.join(DATA_DIR, "chrome_history.sqlite")
 
 
 def add_datetime(df):
     df = df.copy()
 
-    df['timestamp'] = df['timestamp'].fillna(0)
-
-    df['datetime_utc'] = pd.to_datetime(df['timestamp'] / 1000000, unit='s', utc=True)
+    df['datetime_utc'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
     df['datetime_local'] = df['datetime_utc'].apply(lambda x: x.replace(tzinfo=video_timezone).astimezone(local_timezone))
     return df
 
-def get_firefox_history(db_file=FIREFOX_DB_FILE, db_file_tmp=DB_TMP_FILE, kw_filter=True):
+def get_firefox_history(db_file=FIREFOX_HISTORY_FILE, db_file_tmp=FIREFOX_TMP_FILE):
+    """Retrieves Firefox browsing history."""
+    if not os.path.exists(db_file):
+        return pd.DataFrame()
     shutil.copy(db_file, db_file_tmp)
     conn = sqlite3.connect(db_file_tmp)
-    places = pd.read_sql("SELECT * FROM moz_places", con=conn)
+    history = pd.read_sql("SELECT * FROM moz_places", con=conn)
 
-    places['timestamp'] = places['last_visit_date']
-    places = add_datetime(places)
+    # Drop entries with missing titles
+    history = history.dropna(subset=['title'])
 
-    places = places.dropna(subset=['title'])
+    history['timestamp'] = history['last_visit_date'].fillna(0) / 1000000
+    history['description'] = history['description'].fillna("No description")
+    history['title_description'] = history.apply(lambda row: row["title"] + ":" + row['description'], axis=1)
+    history['browser'] = "Firefox"
+    return history
 
-    places['description'] = places['description'].fillna("No description")
-    places['title_description'] = places.apply(lambda row: row["title"] + ":" + row['description'], axis=1)
+def get_chrome_history(db_file=CHROME_HISTORY_FILE, db_file_tmp=CHROME_TMP_FILE):
+    """Retrieves Chrome browsing history."""
+    if not os.path.exists(db_file):
+        return pd.DataFrame()
+    
+    # Copy the database to avoid locking issues
+    shutil.copy(db_file, db_file_tmp)
+    conn = sqlite3.connect(db_file_tmp)
+
+    # Query the history database
+    query = """
+    SELECT 
+        urls.url, 
+        urls.title, 
+        visits.visit_time/1000000 - 11644473600 AS timestamp 
+    FROM urls, visits 
+    WHERE urls.id = visits.url;
+    """
+    
+    history = pd.read_sql(query, con=conn)
+
+    # Drop entries with missing titles
+    history = history.dropna(subset=['title'])
+
+    # Fill missing descriptions
+    history['description'] = history['title'].fillna("No description")
+    history['title_description'] = history.apply(lambda row: row["title"] + ":" + row['description'], axis=1)
+    history['browser'] = "Chrome"
+    return history
+
+def get_browser_history(kw_filter=True):
+    """Retrieves and pre-proccesses browser history from all found browsers."""
+    histories = list()
+    histories.append(get_firefox_history())
+    histories.append(get_chrome_history())
+    
+    history = pd.concat(histories)
+    history = add_datetime(history)
+    history = history.sort_values(by='timestamp', ascending=True)
 
     if kw_filter:
         filter_keywords = ["Inbox", "Gmail", "ChatGPT", "Home", "LinkedIn", "Sign In", "Google Slides", "Google Search"]
         for kw in filter_keywords:
-            places = places.loc[~(places['title_description'].str.lower().str.contains(kw.lower()))]
-    return places
+            history = history.loc[~(history['title_description'].str.lower().str.contains(kw.lower()))]
+    return history
 
 def open_urls(urls):
     for url in urls:

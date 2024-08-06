@@ -6,7 +6,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 
-from utils import get_firefox_history, make_dir
+from utils import get_browser_history, make_dir
 
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = BASE_DIR /  "data"
@@ -86,5 +86,5 @@ def ingest_browser_history(history):
     run_chroma_ingest_batched(history, news_collection)
 
 if __name__ == "__main__":
-    history_df = get_firefox_history()
+    history_df = get_browser_history()
     ingest_browser_history(history=history_df)

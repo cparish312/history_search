@@ -6,7 +6,7 @@ from chromadb_tools import get_chroma_collection, chroma_search_results_to_df, i
 gc.collect()
 
 chroma_collection = get_chroma_collection(collection_name="browser_history")
-history = utils.get_firefox_history()
+history = utils.get_browser_history()
 ingest_browser_history(history)
 
 def search_history(text, distance_threshold=0.5, top_n=2000, time_bin="M"):
