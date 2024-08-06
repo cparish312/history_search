@@ -3,7 +3,7 @@
 ## Setup
 1) **Conda Environment:**
     *   Install [conda](https://docs.anaconda.com/free/miniconda/miniconda-install/) if you don't have it already
-    *   Create the conda environment: `conda env create -f hin_env_mac.yml`
+    *   Create the conda environment: `conda env create -f history_search_env.yml`
     *   Activate the env using: `conda activate history_search`
 
 ## Run
