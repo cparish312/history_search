@@ -46,7 +46,7 @@ app.layout = html.Div([
         html.Label('Search Text: ', htmlFor='input-search'),
         dcc.Input(id='input-search', type='text', placeholder='Enter search term'),
         html.Label(' Embedding Distance Threshold: ', htmlFor='input-distance-threshold'),
-        dcc.Input(id='input-distance-threshold', type='number', placeholder='Enter threshold', value=0.8),
+        dcc.Input(id='input-distance-threshold', type='number', placeholder='Enter threshold', value=1.2),
         html.Button('Search', id='button-search'),
     ], style={'margin-bottom': '10px'}),  # Add a bottom margin for spacing between sections
 
