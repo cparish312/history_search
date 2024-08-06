@@ -99,4 +99,5 @@ def get_browser_history(kw_filter=True):
 
 def open_urls(urls):
     for url in urls:
-        webbrowser.get('firefox').open(url, new=1, autoraise=True)
+        webbrowser.open(url, new=1, autoraise=True)
+        # webbrowser.get('firefox').open(url, new=1, autoraise=True)
