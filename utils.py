@@ -1,4 +1,5 @@
 import os
+from sys import platform
 import shutil
 import sqlite3
 from pathlib import Path
@@ -19,10 +20,17 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(base_dir, "data")
 make_dir(DATA_DIR)
 
-FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"))
-FIREFOX_TMP_FILE = Path(os.path.join(DATA_DIR, "firefox_history.sqlite"))
+if platform == "linux" or platform == "linux2":
+    pass
+elif platform == "darwin":
+    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"))
+    CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
+elif platform == "win32":
+    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("\AppData\Roaming\Mozilla\Firefox\Profiles\vze01ffv.default-release\places.sqlite"))
+    CHROME_HISTORY_FILE = Path(os.path.expanduser("~\AppData\Local\Google\Chrome\User Data\Default\History"))
 
-CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
+
+FIREFOX_TMP_FILE = Path(os.path.join(DATA_DIR, "firefox_history.sqlite"))
 CHROME_TMP_FILE = Path(os.path.join(DATA_DIR, "chrome_history.sqlite"))
 
 
