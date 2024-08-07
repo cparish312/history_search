@@ -55,7 +55,7 @@ def run_chroma_ingest(df, chroma_collection):
     for i, row in df.iterrows():
         documents.append(row['title_description'])
         metadatas.append(get_browser_history_chromadb_metadata(row))
-        ids.append(row['url'])
+        ids.append(str(row['url_hash']))
 
     if len(documents) == 0:
         return

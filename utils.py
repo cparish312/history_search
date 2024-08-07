@@ -1,4 +1,5 @@
 import os
+import hashlib
 from sys import platform
 import shutil
 import sqlite3
@@ -170,6 +171,15 @@ def get_arc_history(db_file=ARC_HISTORY_FILE, db_file_tmp=ARC_TMP_FILE):
     print(f"{len(history)} urls from Arc")
     return history
 
+def positive_hash(obj):
+    # Convert the object to string and encode to bytes
+    obj_str = str(obj).encode()
+    hash_object = hashlib.sha256(obj_str)  # Using SHA-256 hash function
+    hash_digest = hash_object.digest()  # Get the bytes of the hash
+    # Convert bytes to a positive integer
+    hash_int = int.from_bytes(hash_digest, 'big') 
+    return hash_int % ((1 << 61) - 1)
+
 # Function to retrieve and preprocess browser history from all browsers
 def get_browser_history(kw_filter=True):
     """Retrieves and pre-processes browser history from all found browsers."""
@@ -195,7 +205,7 @@ def get_browser_history(kw_filter=True):
         for kw in filter_keywords:
             history = history.loc[~(history['title_description'].str.lower().str.contains(kw.lower()))]
 
-    history['url_hash'] = history['url'].apply(lambda u : hash(u) % ((1 << 61) - 1)) # Positive hash
+    history['url_hash'] = history['url'].apply(lambda u : positive_hash(u)) # Positive hash
     return history
 
 # Function to open URLs in specified browser
