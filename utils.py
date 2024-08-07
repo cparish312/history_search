@@ -110,6 +110,8 @@ def get_browser_history(kw_filter=True):
         filter_keywords = ["Inbox", "Gmail", "ChatGPT", "Home", "LinkedIn", "Sign In", "Google Slides", "Google Search"]
         for kw in filter_keywords:
             history = history.loc[~(history['title_description'].str.lower().str.contains(kw.lower()))]
+
+    history['url_hash'] = history['url'].apply(lambda u : hash(u) % ((1 << 61) - 1)) # Positive hash
     return history
 
 def open_urls(urls):
