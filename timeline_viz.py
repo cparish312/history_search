@@ -11,8 +11,8 @@ app = dash.Dash(__name__)
 
 node_ids = list()
 
-urls_values = []
-titles_values = []
+point_urls_values = []
+point_titles_values = []
 
 selected_urls = []
 selected_titles = []
@@ -23,8 +23,8 @@ def generate_color_dict(clusters):
     return colors
 
 def create_line_plot_figure(data_points):
-    global urls_values
-    global titles_values
+    global point_urls_values
+    global point_titles_values
 
     # Preparing data for plotting
     x_values = [point[0].start_time.to_pydatetime() for point in data_points]
@@ -58,6 +58,8 @@ def create_line_plot_figure(data_points):
             hoverinfo='text',
             text=[point[3] for point in points]  # hover text from titles
         ))
+        point_urls_values.extend([point[2] for point in points])
+        point_titles_values.extend([point[3] for point in points])
 
     # Update layout with titles and hover mode
     fig.update_layout(
@@ -148,8 +150,9 @@ def display_url(clickData):
     global selected_titles
     if clickData:
         node_index = clickData['points'][0]['pointIndex']
-        selected_urls = urls_values[node_index]  # Assume urls_values is defined globally or fetched dynamically
-        selected_titles = titles_values[node_index]
+        print(node_index)
+        selected_urls = point_urls_values[node_index]
+        selected_titles = point_titles_values[node_index]
         
         # Format URLs and titles as Markdown links
         markdown_links = "\n".join(
