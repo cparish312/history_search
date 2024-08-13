@@ -33,10 +33,9 @@ def find_firefox_profile():
 
     profiles = list(profile_path.glob("*.default-release"))
     if profiles:
-        return max(profiles, key=os.path.getmtime)  # return the most recently modified profile
+        return max(profiles, key=os.path.getmtime)
     return None
 
-# Define Firefox history file based on the latest profile
 firefox_profile = find_firefox_profile()
 if firefox_profile:
     FIREFOX_HISTORY_FILE = firefox_profile / "places.sqlite"

@@ -126,13 +126,13 @@ def display_url(clickData):
 
 @app.callback(
     Output('output-graph', 'figure'),
-    [Input('button-search', 'n_clicks')],
+    [Input('button-search', 'n_clicks'),
+     Input('input-time-bins', 'value')],
     [State('input-search', 'value'),
-     State('input-distance-threshold', 'value'),
-     State('input-time-bins', 'value')],
+     State('input-distance-threshold', 'value')],
     prevent_initial_call=True
 )
-def update_graph(n_clicks, search_text, distance_threshold, time_bin):
+def update_graph(n_clicks, time_bin, search_text, distance_threshold):
     global node_ids
     global initial_graph_height
     ctx = dash.callback_context
@@ -142,7 +142,8 @@ def update_graph(n_clicks, search_text, distance_threshold, time_bin):
 
     trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    if trigger_id == 'button-search':
+    if trigger_id == 'button-search' or trigger_id == 'input-time-bins':
+        print(time_bin)
         data_points = search_history(text=search_text, distance_threshold=distance_threshold, time_bin=time_bin)
         return create_line_plot_figure(data_points=data_points)
     else:
