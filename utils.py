@@ -23,22 +23,39 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(base_dir, "data")
 make_dir(DATA_DIR)
 
+def find_firefox_profile():
+    if platform == "linux" or platform == "linux2":
+        profile_path = Path(os.path.expanduser("~/.mozilla/firefox"))
+    elif platform == "darwin":
+        profile_path = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles"))
+    elif platform == "win32":
+        profile_path = Path(os.path.expanduser(r"~\AppData\Roaming\Mozilla\Firefox\Profiles"))
+
+    profiles = list(profile_path.glob("*.default-release"))
+    if profiles:
+        return max(profiles, key=os.path.getmtime)  # return the most recently modified profile
+    return None
+
+# Define Firefox history file based on the latest profile
+firefox_profile = find_firefox_profile()
+if firefox_profile:
+    FIREFOX_HISTORY_FILE = firefox_profile / "places.sqlite"
+else:
+    FIREFOX_HISTORY_FILE = None
+
 # Define paths based on the operating system
 if platform == "linux" or platform == "linux2":
-    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/.mozilla/firefox/*.default-release/places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser("~/.config/google-chrome/Default/History"))
     BRAVE_HISTORY_FILE = Path(os.path.expanduser("~/.config/BraveSoftware/Brave-Browser/Default/History"))
-    ARC_HISTORY_FILE = Path(os.path.expanduser("~/.arc/User Data/Default/History"))  # Update to Arc's correct path on Linux
+    ARC_HISTORY_FILE = Path(os.path.expanduser("~/.arc/User Data/Default/History"))
 elif platform == "darwin":
-    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/*.default-release/places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
     BRAVE_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/BraveSoftware/Brave-Browser/Default/History"))
-    ARC_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Arc/User Data/Default/History"))  # Correct path for macOS
+    ARC_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Arc/User Data/Default/History"))
 elif platform == "win32":
-    FIREFOX_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Roaming\Mozilla\Firefox\Profiles\*.default-release\places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\Google\Chrome\User Data\Default\History"))
     BRAVE_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\History"))
-    ARC_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\Arc\User Data\User Data\Default\History"))  # Correct path for Windows
+    ARC_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\Arc\User Data\User Data\Default\History"))
 
 # Temporary files for processing history
 FIREFOX_TMP_FILE = Path(os.path.join(DATA_DIR, "firefox_history.sqlite"))
@@ -56,7 +73,7 @@ def add_datetime(df):
 # Function to retrieve Firefox browsing history
 def get_firefox_history(db_file=FIREFOX_HISTORY_FILE, db_file_tmp=FIREFOX_TMP_FILE):
     """Retrieves Firefox browsing history."""
-    if not db_file.exists():
+    if db_file is None or not db_file.exists():
         return pd.DataFrame()
     shutil.copy(db_file, db_file_tmp)
     conn = sqlite3.connect(db_file_tmp)
