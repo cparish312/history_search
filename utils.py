@@ -193,7 +193,7 @@ def positive_hash(obj):
     hash_digest = hash_object.digest()  # Get the bytes of the hash
     # Convert bytes to a positive integer
     hash_int = int.from_bytes(hash_digest, 'big') 
-    return hash_int % ((1 << 61) - 1)
+    return int(hash_int % ((1 << 61) - 1))
 
 # Function to retrieve and preprocess browser history from all browsers
 def get_browser_history(kw_filter=True):
@@ -219,6 +219,8 @@ def get_browser_history(kw_filter=True):
         filter_keywords = ["Inbox", "Gmail", "ChatGPT", "Home", "LinkedIn", "Sign In", "Google Slides", "Google Search"]
         for kw in filter_keywords:
             history = history.loc[~(history['title_description'].str.lower().str.contains(kw.lower()))]
+
+    history = history.loc[~(history['url'].str[:8] == "file:///")]
 
     history['url_hash'] = history['url'].apply(lambda u : positive_hash(u)) # Positive hash
     return history
