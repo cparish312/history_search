@@ -30,13 +30,12 @@ if platform == "linux" or platform == "linux2":
     BRAVE_HISTORY_FILE = Path(os.path.expanduser("~/.config/BraveSoftware/Brave-Browser/Default/History"))
     ARC_HISTORY_FILE = Path(os.path.expanduser("~/.arc/User Data/Default/History"))  # Update to Arc's correct path on Linux
 elif platform == "darwin":
-    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/vze01ffv.default-release/places.sqlite"))
+    FIREFOX_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Firefox/Profiles/*.default-release/places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/History"))
     BRAVE_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/BraveSoftware/Brave-Browser/Default/History"))
     ARC_HISTORY_FILE = Path(os.path.expanduser("~/Library/Application Support/Arc/User Data/Default/History"))  # Correct path for macOS
 elif platform == "win32":
-    print("Using Windows")
-    FIREFOX_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Roaming\Mozilla\Firefox\Profiles\vze01ffv.default-release\places.sqlite"))
+    FIREFOX_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Roaming\Mozilla\Firefox\Profiles\*.default-release\places.sqlite"))
     CHROME_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\Google\Chrome\User Data\Default\History"))
     BRAVE_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\History"))
     ARC_HISTORY_FILE = Path(os.path.expanduser(r"~\AppData\Local\Arc\User Data\User Data\Default\History"))  # Correct path for Windows
