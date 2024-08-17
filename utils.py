@@ -5,6 +5,8 @@ import shutil
 import sqlite3
 from pathlib import Path
 import pandas as pd
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 import webbrowser
 
 import tzlocal
@@ -240,3 +242,22 @@ def open_urls(urls, browser="default"):
         elif browser == "arc":
             webbrowser.get('arc').open(url, new=1, autoraise=True)
 
+
+def get_thumbnail_url(source_url, html):
+    soup = BeautifulSoup(html, 'html.parser')
+    
+    # First, try to find the 'og:image' content
+    og_image = soup.find('meta', property='og:image')
+    if og_image and og_image.get('content'):
+        image_url = og_image['content']
+        # Convert relative URL to absolute URL using urljoin
+        return urljoin(source_url, image_url)
+    
+    # If 'og:image' is not found, fall back to the first 'img' tag
+    image_tag = soup.find('img')
+    if image_tag and 'src' in image_tag.attrs:
+        image_url = image_tag['src']
+        # Convert relative URL to absolute URL using urljoin
+        return urljoin(source_url, image_url)
+    
+    return None  # Return None if no suitable image is found
